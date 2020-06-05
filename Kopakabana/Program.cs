@@ -161,7 +161,6 @@ namespace Kopakabana
                                 break;
                             case 3:
                                 // wyswietl druzyne
-                                // zmiane dalem
                                 turniej.wyswietlDruzyny();
                                 Console.WriteLine("Kliknij cokolwiek aby kontynuowac :)");
                                 Console.ReadLine();
