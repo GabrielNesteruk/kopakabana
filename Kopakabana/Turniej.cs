@@ -10,7 +10,7 @@ namespace Kopakabana
 
 	class Turniej
 	{
-
+		//komentarz
 		private string nazwa;
 		private string typ;
 		private List<Sedzia> listaSedziow;
