@@ -51,7 +51,7 @@ namespace Kopakabana
             Turniej turniej = new Turniej();
 
             string wybor, nazwaTurnieju;
-            bool warunkiStartuTurnieju = false;
+            bool warunkiStartuTurnieju;
 
             menuWstepne();
             int etapWyboru = 0; // 0 - menuWstepne // 1 - menuTypTurnieju // 2 - menuGlowne   
@@ -144,16 +144,14 @@ namespace Kopakabana
                                 Console.Clear();
                                 string naz_druzyny = String.Empty, typ = turniej.getTyp;
                                 int iloscPunktow = 0;
-
                                 Console.WriteLine("Podaj nazwe druzyny: ");
                                 naz_druzyny = Console.ReadLine();
-
-
                                 Druzyna druzyna = new Druzyna(naz_druzyny, iloscPunktow, typ);
                                 turniej.dodajDruzyne(druzyna);
                                 break;
                             case 2:
                                 // usun druzyne
+                                Console.Clear();
                                 turniej.wyswietlDruzyny();
                                 Console.WriteLine("Podaj nazwe druzyny ktora chcesz usunac: ");
                                 naz_druzyny = Console.ReadLine();
@@ -161,6 +159,7 @@ namespace Kopakabana
                                 break;
                             case 3:
                                 // wyswietl druzyne
+                                Console.Clear();
                                 turniej.wyswietlDruzyny();
                                 Console.WriteLine("Kliknij cokolwiek aby kontynuowac :)");
                                 Console.ReadLine();
@@ -204,9 +203,9 @@ namespace Kopakabana
                     Console.WriteLine("Oszukano zabezpieczenia");
             }
             // rozgrywanie meczy
-            if(warunkiStartuTurnieju == true)
-            {
-            }
+            turniej.rozegrajMecze();
+            turniej.wyswietlDruzyny();
+
         }
     }
 }

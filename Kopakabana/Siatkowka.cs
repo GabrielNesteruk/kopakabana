@@ -1,31 +1,25 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Kopakabana
 {
     class Siatkowka : Mecz
-    {
-        private Sedzia sedziapomocniczy1;
-        private Sedzia sedziapomocniczy2;
+	{
 
-        public Sedzia Sedziapomocniczy1 { get; private set; }
-        public Sedzia Sedziapomocniczy2 { get; private set; }
+		public List<Sedzia> sedziowieDodatkowi = new List<Sedzia>();
 
+		public Siatkowka(Druzyna druzyna1, Druzyna druzyna2, Sedzia sedziaGlowny, string faza) : base(druzyna1, druzyna2, sedziaGlowny, faza)
+		{
 
-        public Siatkowka(Druzyna druzyna1, Druzyna druzyna2, Sedzia sedziaGlowny, string faza) : base(druzyna1, druzyna2, sedziaGlowny, faza)
-        {
-
-        }
+		}
 
         public override void wypiszStatystykiMeczu()
 		{
 			druzyna1.pokazDruzyne();
 			druzyna2.pokazDruzyne();
 
-			Console.WriteLine(
-				$"Sedzia Glowny: {sedziaGlowny}" +
-				$"Sedzia pomocniczy: {sedziapomocniczy1}" +
-				$"Sedzia pomocniczy: {sedziapomocniczy2}"
-			);
+			Console.WriteLine("Sedzia główny: " + sedziaGlowny.getImie() + sedziaGlowny.getNazwisko() + " Sedzia dodatkowy: " + sedziowieDodatkowi[0].getImie() + " " + sedziowieDodatkowi[0].getNazwisko() + ", "+ sedziowieDodatkowi[1].getImie() + " " + sedziowieDodatkowi[1].getNazwisko());
+			Console.WriteLine();
 		}
 	}
 }
