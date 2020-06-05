@@ -8,10 +8,10 @@ namespace Kopakabana
 
 		public List<Sedzia> sedziowieDodatkowi = new List<Sedzia>();
 
-		public Siatkowka(Druzyna druzyna1, Druzyna druzyna2, Sedzia sedziaGlowny, string faza) : base(druzyna1, druzyna2, sedziaGlowny, faza)
-		{
+        public Siatkowka(Druzyna druzyna1, Druzyna druzyna2, Sedzia sedziaGlowny, string faza) : base(druzyna1, druzyna2, sedziaGlowny, faza)
+        {
 
-		}
+        }
 
         public override void wypiszStatystykiMeczu()
 		{

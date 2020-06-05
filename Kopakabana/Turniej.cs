@@ -139,6 +139,7 @@ namespace Kopakabana
 				pomocnicza = 0;
 			}
 		}
+
 		public void usunSedziegoTurniejowego()
 		{
 			int pom = 0;
@@ -165,8 +166,7 @@ namespace Kopakabana
 				}
 			}
 		}
-
-		public void wyswietlSedziowTurniejowych()
+    public void wyswietlSedziowTurniejowych()
 		{
 			int zmienna = 1;
 			foreach (var sedzia in listaSedziow)
@@ -540,8 +540,16 @@ namespace Kopakabana
 			}
 
 		}
+        {
+     
+        }
 		public void wczytajTurniejPlik() { }
-		public void klasyfikujDruzynyPolfinal() { }
+		public void klasyfikujDruzynyPolfinal()
+        {
+            listaDruznFazaGrupowa.Sort((x, y) => x.getPunkty.CompareTo(y.getPunkty));
+            for (int i = 0; i < 4; i++)
+                listaDruzynFazaFinalowa.Add(listaDruznFazaGrupowa[i]);
+        }
 		public void klasyfikujDruzynyFinal() { }
 		public void wypiszTabeleWynikow() { }
 
