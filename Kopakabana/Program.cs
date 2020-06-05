@@ -51,7 +51,7 @@ namespace Kopakabana
             Turniej turniej = new Turniej();
 
             string wybor, nazwaTurnieju;
-            bool warunkiStartuTurnieju;
+            bool warunkiStartuTurnieju = false;
 
             menuWstepne();
             int etapWyboru = 0; // 0 - menuWstepne // 1 - menuTypTurnieju // 2 - menuGlowne   
@@ -204,6 +204,9 @@ namespace Kopakabana
                     Console.WriteLine("Oszukano zabezpieczenia");
             }
             // rozgrywanie meczy
+            if(warunkiStartuTurnieju == true)
+            {
+            }
         }
     }
 }

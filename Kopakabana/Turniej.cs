@@ -138,27 +138,33 @@ namespace Kopakabana
 				pomocnicza = 0;
 			}
 		}
-		public void usunSedziegoTurniejowego()
-		{
-			string imie = String.Empty, nazwisko = String.Empty;
-			Console.WriteLine("Podaj imie: ");
-			imie = Console.ReadLine();
-			Console.WriteLine("Podaj nazwisko: ");
-			nazwisko = Console.ReadLine();
-			for (int i = 0; i < listaSedziow.Count; i++)
-			{
-				if (listaSedziow[i].getNazwisko().Equals(nazwisko, StringComparison.OrdinalIgnoreCase) && listaSedziow[i].getImie().Equals(imie, StringComparison.OrdinalIgnoreCase))
-				{
-					listaSedziow.RemoveAt(i);
-				}
-				else
-				{
-					Console.WriteLine("Podany sedzia nie istnieje w bazie, aby przejsc dalej nacisnij cokolwiek");
-					Console.ReadKey();
-				}
-			}
-		}
-		public void wyswietlSedziowTurniejowych()
+        public void usunSedziegoTurniejowego()
+        {
+            int pom = 0;
+            string imie = String.Empty, nazwisko = String.Empty;
+            Console.WriteLine("Podaj imie: ");
+            imie = Console.ReadLine();
+            Console.WriteLine("Podaj nazwisko: ");
+            nazwisko = Console.ReadLine();
+            for (int i = 0; i < listaSedziow.Count; i++)
+            {
+                if (listaSedziow[i].getNazwisko().Equals(nazwisko, StringComparison.OrdinalIgnoreCase) && listaSedziow[i].getImie().Equals(imie, StringComparison.OrdinalIgnoreCase))
+                {
+                    listaSedziow.RemoveAt(i);
+                    break;
+                }
+                else
+                {
+                    pom++;
+                }
+                if (pom == listaSedziow.Count)
+                {
+                    Console.WriteLine("Podany sedzia nie istnieje w bazie, aby przejsc dalej nacisnij cokolwiek");
+                    Console.ReadKey();
+                }
+            }
+        }
+        public void wyswietlSedziowTurniejowych()
 		{
 			int zmienna = 1;
 			foreach (var sedzia in listaSedziow)
@@ -171,9 +177,17 @@ namespace Kopakabana
 			}
 		}
 
-		public void rozegrajMecze() { }
+		public void rozegrajMecze()
+        {
+     
+        }
 		public void wczytajTurniejPlik() { }
-		public void klasyfikujDruzynyPolfinal() { }
+		public void klasyfikujDruzynyPolfinal()
+        {
+            listaDruznFazaGrupowa.Sort((x, y) => x.getPunkty.CompareTo(y.getPunkty));
+            for (int i = 0; i < 4; i++)
+                listaDruzynFazaFinalowa.Add(listaDruznFazaGrupowa[i]);
+        }
 		public void klasyfikujDruzynyFinal() { }
 		public void wypiszTabeleWynikow() { }
 
