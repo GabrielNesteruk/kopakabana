@@ -174,7 +174,19 @@ namespace Kopakabana
 		public void rozegrajMecze() { }
 		public void wczytajTurniejPlik() { }
 		public void klasyfikujDruzynyPolfinal() { }
-		public void klasyfikujDruzynyFinal() { }
+
+
+		public void klasyfikujDruzynyFinal()
+		{
+			int zwyciezca = -1;
+			foreach (var druzyna in listaDruzynFazaPolfinalowo)
+			{
+				if (druzyna.getIloscPunktow > zwyciezca)
+					finalista = druzyna;
+			}
+		}
+
+
 		public void wypiszTabeleWynikow() { }
 
 	}

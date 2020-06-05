@@ -25,6 +25,7 @@ namespace Kopakabana
         }
 
         public string getNazwa => nazwa;
+        public int getIloscPunktow => iloscPunktow;
 
         public void pokazDruzyne()
         {
