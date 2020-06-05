@@ -204,6 +204,7 @@ namespace Kopakabana
             }
             // rozgrywanie meczy
             turniej.rozegrajMecze();
+            turniej.wyswietlDruzyny();
         }
     }
 }
