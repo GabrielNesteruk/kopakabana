@@ -110,7 +110,7 @@ namespace Kopakabana
                                 Console.Clear();
                                 Console.WriteLine("Podaj nazwe turnieju:");
                                 nazwaTurnieju = Console.ReadLine();
-                                turniej = new Turniej(nazwaTurnieju, "Dwa_Ognie");
+                                turniej = new Turniej(nazwaTurnieju, "Dwa_ognie");
                                 etapWyboru++;
                                 break;
                             case 3:
@@ -204,6 +204,7 @@ namespace Kopakabana
             }
             // rozgrywanie meczy
             turniej.rozegrajMecze();
+            turniej.wypiszTabeleWynikow();
         }
     }
 }

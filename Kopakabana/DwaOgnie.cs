@@ -14,7 +14,7 @@ namespace Kopakabana
 			druzyna1.pokazDruzyne();
 			druzyna2.pokazDruzyne();
 
-			Console.WriteLine($"Sedzia Glowny: {sedziaGlowny}");
+			Console.WriteLine($"Sedzia Glowny: {sedziaGlowny.getImie()} {sedziaGlowny.getNazwisko()}");
 		}
 	}
 }

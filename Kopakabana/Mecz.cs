@@ -29,8 +29,32 @@ namespace Kopakabana
 
 		public virtual void wypiszStatystykiMeczu() { }
 
+        public int PunktyZwyciestwo
+        {
+            get
+            {
+                return punktyZwyciestwo;
+            }
+        }
 
-		public int PunktyDruzyny_1 
+        public int PunktyPrzegrana
+        {
+            get
+            {
+                return punktyPrzegrana;
+            }
+        }
+
+        public int PunktyRemis
+        {
+            get
+            {
+                return punktyRemis;
+            }
+        }
+
+
+        public int PunktyDruzyny_1 
 		{
 			get => punktyDruzyny1;
 			private set {

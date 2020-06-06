@@ -11,11 +11,9 @@ namespace Kopakabana
 
 	class Turniej
 	{
-		//komentarz
 		private string nazwa;
 		private string typ;
 		private List<Sedzia> listaSedziow;
-		private List<Mecz> listaWszystkichMeczy;
         private List<Mecz> listaMeczyFazaGrupowa;
         private List<Mecz> listaMeczyFazaPolfinalowa;
         private List<Mecz> listaMeczyFazaFinalowa;
@@ -32,7 +30,6 @@ namespace Kopakabana
 			this.nazwa = nazwa;
 			this.typ = typ;
 			listaSedziow = new List<Sedzia>();
-			listaWszystkichMeczy = new List<Mecz>();
 			listaDruzynFazaGrupowa = new List<Druzyna>();
 			listaDruzynFazaPolfinalowo = new List<Druzyna>();
 			listaDruzynFazaFinalowa = new List<Druzyna>();
@@ -56,8 +53,6 @@ namespace Kopakabana
 		{
 			listaDruzynFazaGrupowa.Add(d);
 		}
-
-
 		public void usunDruzyne(string nazwa)
 		{
 			if (listaDruzynFazaGrupowa.Count == 0)
@@ -72,8 +67,6 @@ namespace Kopakabana
 					}
 				}
 		}
-
-
 		public void wyswietlDruzyny()
 		{
 			if (listaDruzynFazaGrupowa.Count == 0)
@@ -86,29 +79,6 @@ namespace Kopakabana
 		}
 
 
-		public bool wystartujTurniej()
-		{
-			if (listaDruzynFazaGrupowa.Count < 4)
-			{
-				Console.WriteLine("Turniej nie wystartowal! [ za mala ilosc druzyn ]");
-				return false;
-			}
-			else if (listaSedziow.Count < 1)
-			{
-				Console.WriteLine("Turniej nie wystartowal! [ musisz dodac przynajmniej 1 sedziego ]");
-				return false;
-			}
-			else if (listaSedziow.Count < 3 && typ == "Siatkowka")
-			{
-				Console.WriteLine("Turniej nie wystartowal! [ w przypadku meczy siatkowki musisz dodac przynajmniej 3 sedziow! ]");
-				return false;
-			}
-			else
-			{
-				Console.WriteLine("Warunki startu turnieju zostaly spelnione");
-				return true;
-			}
-		}
 
 		public void dodajSedzieTurniejowego()
 		{
@@ -146,7 +116,6 @@ namespace Kopakabana
 				pomocnicza = 0;
 			}
 		}
-
 		public void usunSedziegoTurniejowego()
 		{
 			int pom = 0;
@@ -173,7 +142,7 @@ namespace Kopakabana
 				}
 			}
 		}
-    public void wyswietlSedziowTurniejowych()
+        public void wyswietlSedziowTurniejowych()
 		{
 			int zmienna = 1;
 			foreach (var sedzia in listaSedziow)
@@ -186,429 +155,486 @@ namespace Kopakabana
 			}
 		}
 
+
+        private int generujRezultatMeczu()
+        {
+            // 0 - wygrala druzyna 1
+            // 1 - wygrala druzyna 2
+            // 2 - remis
+            Random generator = new Random();
+            int randomowa = generator.Next(3);
+            return randomowa;
+        }
+        private void pokazMecz(Mecz m)
+        {
+            Console.WriteLine($"***********************************************\nMecz pomiedzy:\n");
+            m.wypiszStatystykiMeczu();
+            Console.WriteLine($"***********************************************\n\n\n");
+        }
+        private Mecz utworzMecz(int i, int j, string faza)
+        {
+            if (this.typ == "Dwa_ognie")
+                return new DwaOgnie(listaDruzynFazaGrupowa[i], listaDruzynFazaGrupowa[j], listaSedziow[0], faza);
+            else if (this.typ == "Przeciaganie_Liny")
+                return new PrzeciaganieLiny(listaDruzynFazaGrupowa[i], listaDruzynFazaGrupowa[j], listaSedziow[0], faza);
+            else
+                throw new WrongMatchTypeException("Blad programu! [ Obiekt meczu zostal stworzony nieprawidlowo ]");
+        }
+
+        private void dodajSedziowPomocnicznychSiatka(Siatkowka s)
+        {
+            s.sedziowieDodatkowi.Add(listaSedziow[1]);
+            s.sedziowieDodatkowi.Add(listaSedziow[2]);
+        }
+        private void rozegrajMeczeSiatkowkiDanejFazy(string faza)
+        {
+            if (faza == "Faza grupowa")
+            {
+                for (int i = 0; i < listaDruzynFazaGrupowa.Count; i++)
+                {
+                    for (int j = i + 1; j < listaDruzynFazaGrupowa.Count; j++)
+                    {
+                        // 0 - wygrala druzyna 1
+                        // 1 - wygrala druzyna 2
+                        // 2 - remis
+
+                        int rezultatMeczu = generujRezultatMeczu();
+                        if (rezultatMeczu == 0)
+                        {
+                            // druzyna i win
+                            Siatkowka siatkowka_mecz = new Siatkowka(listaDruzynFazaGrupowa[i], listaDruzynFazaGrupowa[j], listaSedziow[0], faza);
+                            listaDruzynFazaGrupowa[i].dodajPunkty(siatkowka_mecz.PunktyZwyciestwo);
+                            listaDruzynFazaGrupowa[j].dodajPunkty(siatkowka_mecz.PunktyPrzegrana);
+                            dodajSedziowPomocnicznychSiatka(siatkowka_mecz);
+                            Console.WriteLine($"Wygrala druzyna {listaDruzynFazaGrupowa[i].getNazwa}");
+                            listaMeczyFazaGrupowa.Add(siatkowka_mecz);
+                            pokazMecz(siatkowka_mecz);
+                        }
+                        else if (rezultatMeczu == 1)
+                        {
+                            // druzyna j win
+                            Siatkowka siatkowka_mecz = new Siatkowka(listaDruzynFazaGrupowa[i], listaDruzynFazaGrupowa[j], listaSedziow[0], faza);
+                            listaDruzynFazaGrupowa[i].dodajPunkty(siatkowka_mecz.PunktyPrzegrana);
+                            listaDruzynFazaGrupowa[j].dodajPunkty(siatkowka_mecz.PunktyZwyciestwo);
+                            dodajSedziowPomocnicznychSiatka(siatkowka_mecz);
+                            listaMeczyFazaGrupowa.Add(siatkowka_mecz);
+                            Console.WriteLine($"Wygrala druzyna {listaDruzynFazaGrupowa[j].getNazwa}");
+                            pokazMecz(siatkowka_mecz);
+                        }
+                        else
+                        {
+                            // remis
+                            Siatkowka siatkowka_mecz = new Siatkowka(listaDruzynFazaGrupowa[i], listaDruzynFazaGrupowa[j], listaSedziow[0], faza);
+                            listaDruzynFazaGrupowa[i].dodajPunkty(siatkowka_mecz.PunktyRemis);
+                            listaDruzynFazaGrupowa[j].dodajPunkty(siatkowka_mecz.PunktyRemis);
+                            dodajSedziowPomocnicznychSiatka(siatkowka_mecz);
+                            listaMeczyFazaGrupowa.Add(siatkowka_mecz);
+                            Console.WriteLine($"Remis");
+                            pokazMecz(siatkowka_mecz);
+                        }
+                        
+                    }
+                }
+            }
+            else if (faza == "Faza polfinalowa")
+            {
+                for (int i = 0; i < listaDruzynFazaPolfinalowo.Count; i++)
+                {
+                    for (int j = i + 1; j < listaDruzynFazaPolfinalowo.Count; j++)
+                    {
+                        // 0 - wygrala druzyna 1
+                        // 1 - wygrala druzyna 2
+                        // 2 - remis
+                        int rezultatMeczu = generujRezultatMeczu();
+                        if (rezultatMeczu == 0)
+                        {
+                            Siatkowka siatkowka_mecz = new Siatkowka(listaDruzynFazaPolfinalowo[i], listaDruzynFazaPolfinalowo[j], listaSedziow[0], faza);
+                            listaDruzynFazaPolfinalowo[i].dodajPunkty(siatkowka_mecz.PunktyZwyciestwo);
+                            listaDruzynFazaPolfinalowo[j].dodajPunkty(siatkowka_mecz.PunktyPrzegrana);
+                            dodajSedziowPomocnicznychSiatka(siatkowka_mecz);
+                            Console.WriteLine($"Wygrala druzyna {listaDruzynFazaPolfinalowo[i].getNazwa}");
+                            listaMeczyFazaPolfinalowa.Add(siatkowka_mecz);
+                            pokazMecz(siatkowka_mecz);
+                        }                         
+                        else if (rezultatMeczu == 1)
+                        {                         
+                            Siatkowka siatkowka_mecz = new Siatkowka(listaDruzynFazaPolfinalowo[i], listaDruzynFazaPolfinalowo[j], listaSedziow[0], faza);
+                            listaDruzynFazaPolfinalowo[i].dodajPunkty(siatkowka_mecz.PunktyPrzegrana);
+                            listaDruzynFazaPolfinalowo[j].dodajPunkty(siatkowka_mecz.PunktyZwyciestwo);
+                            dodajSedziowPomocnicznychSiatka(siatkowka_mecz);
+                            Console.WriteLine($"Wygrala druzyna {listaDruzynFazaPolfinalowo[j].getNazwa}");
+                            listaMeczyFazaPolfinalowa.Add(siatkowka_mecz);
+                            pokazMecz(siatkowka_mecz);
+                        }
+                        else
+                        {
+                            Siatkowka siatkowka_mecz = new Siatkowka(listaDruzynFazaPolfinalowo[i], listaDruzynFazaPolfinalowo[j], listaSedziow[0], faza);
+                            listaDruzynFazaPolfinalowo[i].dodajPunkty(siatkowka_mecz.PunktyRemis);
+                            listaDruzynFazaPolfinalowo[j].dodajPunkty(siatkowka_mecz.PunktyRemis);
+                            dodajSedziowPomocnicznychSiatka(siatkowka_mecz);
+                            Console.WriteLine($"Remis");
+                            listaMeczyFazaPolfinalowa.Add(siatkowka_mecz);
+                            pokazMecz(siatkowka_mecz);
+                        }
+                    }
+                }
+            }
+            else if (faza == "Faza finalowa")
+            {
+                {
+                    for (int i = 0; i < listaDruzynFazaFinalowa.Count; i++)
+                    {
+                        for (int j = i + 1; j < listaDruzynFazaFinalowa.Count; j++)
+                        {
+                            int rezultatMeczu = generujRezultatMeczu();
+                            if (rezultatMeczu == 0)
+                            {
+                                Siatkowka siatkowka_mecz = new Siatkowka(listaDruzynFazaFinalowa[i], listaDruzynFazaFinalowa[j], listaSedziow[0], faza);
+                                listaDruzynFazaFinalowa[i].dodajPunkty(siatkowka_mecz.PunktyZwyciestwo);
+                                listaDruzynFazaFinalowa[j].dodajPunkty(siatkowka_mecz.PunktyPrzegrana);
+                                dodajSedziowPomocnicznychSiatka(siatkowka_mecz);
+                                listaMeczyFazaFinalowa.Add(siatkowka_mecz);
+                                Console.WriteLine($"Wygrala druzyna {listaDruzynFazaGrupowa[i].getNazwa}");
+                                pokazMecz(siatkowka_mecz);
+                            }
+                            else if (rezultatMeczu == 1)
+                            {
+                                Siatkowka siatkowka_mecz = new Siatkowka(listaDruzynFazaFinalowa[i], listaDruzynFazaFinalowa[j], listaSedziow[0], faza);
+                                listaDruzynFazaFinalowa[i].dodajPunkty(siatkowka_mecz.PunktyPrzegrana);
+                                listaDruzynFazaFinalowa[j].dodajPunkty(siatkowka_mecz.PunktyZwyciestwo);
+                                dodajSedziowPomocnicznychSiatka(siatkowka_mecz);
+                                listaMeczyFazaFinalowa.Add(siatkowka_mecz);
+                                Console.WriteLine($"Wygrala druzyna {listaDruzynFazaGrupowa[j].getNazwa}");
+                                pokazMecz(siatkowka_mecz);
+                            }
+                            else
+                            {
+                                Siatkowka siatkowka_mecz = new Siatkowka(listaDruzynFazaFinalowa[i], listaDruzynFazaFinalowa[j], listaSedziow[0], faza);
+                                listaDruzynFazaFinalowa[i].dodajPunkty(siatkowka_mecz.PunktyRemis);
+                                listaDruzynFazaFinalowa[j].dodajPunkty(siatkowka_mecz.PunktyRemis);
+                                dodajSedziowPomocnicznychSiatka(siatkowka_mecz);
+                                listaMeczyFazaFinalowa.Add(siatkowka_mecz);
+                                Console.WriteLine($"Remis");
+                                pokazMecz(siatkowka_mecz);
+                            }
+                        }
+                    }
+                }
+            }
+            else
+                throw new WrongMatchPhase("Blad programu! [ Nieprawidlowa faza meczu ]");
+        }
+        private void rozegrajMeczeDanejFazy(string faza)
+        {
+            if (faza == "Faza grupowa")
+            {
+                for (int i = 0; i < listaDruzynFazaGrupowa.Count; i++)
+                {
+                    for (int j = i + 1; j < listaDruzynFazaGrupowa.Count; j++)
+                    {
+                        int rezultatMeczu = generujRezultatMeczu();
+                        if (rezultatMeczu == 0)
+                        {
+                            // druzyna i win
+                            Mecz mecz = utworzMecz(i, j, faza);
+                            listaDruzynFazaGrupowa[i].dodajPunkty(mecz.PunktyZwyciestwo);
+                            listaDruzynFazaGrupowa[j].dodajPunkty(mecz.PunktyPrzegrana);
+                            Console.WriteLine($"Wygrala druzyna {listaDruzynFazaGrupowa[i].getNazwa}");
+                            listaMeczyFazaGrupowa.Add(mecz);
+                            pokazMecz(mecz);
+                        }
+                        else if (rezultatMeczu == 1)
+                        {
+                            // druzyna j win
+                            Mecz mecz = utworzMecz(i, j, faza);
+                            listaDruzynFazaGrupowa[i].dodajPunkty(mecz.PunktyPrzegrana);
+                            listaDruzynFazaGrupowa[j].dodajPunkty(mecz.PunktyZwyciestwo);
+                            listaMeczyFazaGrupowa.Add(mecz);
+                            Console.WriteLine($"Wygrala druzyna {listaDruzynFazaGrupowa[j].getNazwa}");
+                            pokazMecz(mecz);
+                        }
+                        else
+                        {
+                            // remis
+                            Mecz mecz = utworzMecz(i, j, faza);
+                            listaDruzynFazaGrupowa[i].dodajPunkty(mecz.PunktyRemis);
+                            listaDruzynFazaGrupowa[j].dodajPunkty(mecz.PunktyRemis);
+                            listaMeczyFazaGrupowa.Add(mecz);
+                            Console.WriteLine($"Remis");
+                            pokazMecz(mecz);
+                        }
+                    }
+                }
+            }
+            else if (faza == "Faza polfinalowa")
+            {
+                for (int i = 0; i < listaDruzynFazaPolfinalowo.Count; i++)
+                {
+                    for (int j = i + 1; j < listaDruzynFazaPolfinalowo.Count; j++)
+                    {
+                        int rezultatMeczu = generujRezultatMeczu();
+                        if (rezultatMeczu == 0)
+                        {
+                            // druzyna i win
+                            Mecz mecz = utworzMecz(i, j, faza);
+                            listaDruzynFazaPolfinalowo[i].dodajPunkty(mecz.PunktyZwyciestwo);
+                            listaDruzynFazaPolfinalowo[j].dodajPunkty(mecz.PunktyPrzegrana);
+                            Console.WriteLine($"Wygrala druzyna {listaDruzynFazaPolfinalowo[i].getNazwa}");
+                            listaMeczyFazaPolfinalowa.Add(mecz);
+                            pokazMecz(mecz);
+                        }
+                        else if (rezultatMeczu == 1)
+                        {
+                            // druzyna j win
+                            Mecz mecz = utworzMecz(i, j, faza);
+                            listaDruzynFazaPolfinalowo[i].dodajPunkty(mecz.PunktyPrzegrana);
+                            listaDruzynFazaPolfinalowo[j].dodajPunkty(mecz.PunktyZwyciestwo);
+                            listaMeczyFazaPolfinalowa.Add(mecz);
+                            Console.WriteLine($"Wygrala druzyna {listaDruzynFazaPolfinalowo[j].getNazwa}");
+                            pokazMecz(mecz);
+                        }
+                        else
+                        {
+                            // remis
+                            Mecz mecz = utworzMecz(i, j, faza);
+                            listaDruzynFazaPolfinalowo[i].dodajPunkty(mecz.PunktyRemis);
+                            listaDruzynFazaPolfinalowo[j].dodajPunkty(mecz.PunktyRemis);
+                            listaMeczyFazaPolfinalowa.Add(mecz);
+                            Console.WriteLine($"Remis");
+                            pokazMecz(mecz);
+                        }
+                    }
+                }
+            }
+            else if (faza == "Faza finalowa")
+            {
+                {
+                    for (int i = 0; i < listaDruzynFazaFinalowa.Count; i++)
+                    {
+                        for (int j = i + 1; j < listaDruzynFazaFinalowa.Count; j++)
+                        {
+                            int rezultatMeczu = generujRezultatMeczu();
+                            if (rezultatMeczu == 0)
+                            {
+                                // druzyna i win
+                                Mecz mecz = utworzMecz(i, j, faza);
+                                listaDruzynFazaFinalowa[i].dodajPunkty(mecz.PunktyZwyciestwo);
+                                listaDruzynFazaFinalowa[j].dodajPunkty(mecz.PunktyPrzegrana);
+                                Console.WriteLine($"Wygrala druzyna {listaDruzynFazaFinalowa[i].getNazwa}");
+                                listaMeczyFazaFinalowa.Add(mecz);
+                                pokazMecz(mecz);
+                            }
+                            else if (rezultatMeczu == 1)
+                            {
+                                // druzyna j win
+                                Mecz mecz = utworzMecz(i, j, faza);
+                                listaDruzynFazaFinalowa[i].dodajPunkty(mecz.PunktyPrzegrana);
+                                listaDruzynFazaFinalowa[j].dodajPunkty(mecz.PunktyZwyciestwo);
+                                listaMeczyFazaFinalowa.Add(mecz);
+                                Console.WriteLine($"Wygrala druzyna {listaDruzynFazaFinalowa[j].getNazwa}");
+                                pokazMecz(mecz);
+                            }
+                            else
+                            {
+                                // remis
+                                Mecz mecz = utworzMecz(i, j, faza);
+                                listaDruzynFazaFinalowa[i].dodajPunkty(mecz.PunktyRemis);
+                                listaDruzynFazaFinalowa[j].dodajPunkty(mecz.PunktyRemis);
+                                listaMeczyFazaFinalowa.Add(mecz);
+                                Console.WriteLine($"Remis");
+                                pokazMecz(mecz);
+                            }
+                        }
+                    }
+                }
+            }
+            else
+                throw new WrongMatchPhase("Blad programu! [ Nieprawidlowa faza meczu ]");
+        }
 		public void rozegrajMecze()
 		{
-			int punkty_1 = 0;
-			int punkty_2 = 0;
-			int randomowa = 0;
-			int k = 1;
-			int pomocnicza = 1;
-
 			Random generator = new Random();
+
+            //
+            //          SIATKOWKA
+            //
 
             if (this.typ == "Siatkowka")
             {
                 /*
-                 
-                 
+                             
                  MECZE FAZA GRUPOWA + DODAWANIE MECZY DO LIST FAZY GRUPOWEJ
                  
                  */
-
-                for (int i = 0; i < listaDruzynFazaGrupowa.Count - 1; i++)
-                {
-
-                    while (k < listaDruzynFazaGrupowa.Count)
-                    {
-                        randomowa = generator.Next(4);
-                        while (randomowa == 2)
-                        {
-                            randomowa = generator.Next(4);
-                        }
-                        punkty_1 = randomowa;
-                        if (punkty_1 == 0)
-                        {
-                            punkty_2 = 3;
-                        }
-                        else if (punkty_1 == 1)
-                        {
-                            punkty_2 = 1;
-                        }
-                        else if (punkty_1 == 3)
-                        {
-                            punkty_2 = 0;
-                        }
-                        listaDruzynFazaGrupowa[i].dodajPunkty(punkty_1);
-                        listaDruzynFazaGrupowa[k].dodajPunkty(punkty_2);
-                        Siatkowka siatkowka_mecz = new Siatkowka(listaDruzynFazaGrupowa[i], listaDruzynFazaGrupowa[k], listaSedziow[0], "Faza grupowa");
-                        siatkowka_mecz.sedziowieDodatkowi.Add(listaSedziow[1]);
-                        siatkowka_mecz.sedziowieDodatkowi.Add(listaSedziow[2]);
-                        listaMeczyFazaGrupowa.Add(siatkowka_mecz);
-                        k++;
-                    }
-                    pomocnicza++;
-                    k = pomocnicza;
-                }
                 Console.WriteLine("Lista meczy w fazie grupowej\n====================================================\n");
-                for (int i = 0; i < listaMeczyFazaGrupowa.Count; i++)
-                {
-                    Console.WriteLine($"***********************************************\nMecz pomiedzy:");
-                    listaMeczyFazaGrupowa[i].wypiszStatystykiMeczu();
-                    Console.WriteLine($"***********************************************");
-
-
-                    Console.WriteLine();
-                    Console.WriteLine();
-                    Console.WriteLine();
-
-                }
+                rozegrajMeczeSiatkowkiDanejFazy("Faza grupowa");
                 Console.WriteLine("Koniec fazy grupowej\n=============================");
                 Console.ReadKey();
                 Console.Clear();
                 klasyfikujDruzynyPolfinal();
-                k = 1;
-                pomocnicza = 1;
                 /*
-
 
                 MECZE FAZA POLFINALOWA + DODAWANIE MECZY DO LIST FAZY POLFINALOWA
 
                 */
-                for (int i = 0; i < listaDruzynFazaPolfinalowo.Count - 1; i++)
-                {
-
-                    while (k < listaDruzynFazaPolfinalowo.Count)
-                    {
-                        randomowa = generator.Next(4);
-                        while (randomowa == 2)
-                        {
-                            randomowa = generator.Next(4);
-                        }
-                        punkty_1 = randomowa;
-                        if (punkty_1 == 0)
-                        {
-                            punkty_2 = 3;
-                        }
-                        else if (punkty_1 == 1)
-                        {
-                            punkty_2 = 1;
-                        }
-                        else if (punkty_1 == 3)
-                        {
-                            punkty_2 = 0;
-                        }
-                        listaDruzynFazaPolfinalowo[i].dodajPunkty(punkty_1);
-                        listaDruzynFazaPolfinalowo[k].dodajPunkty(punkty_2);
-                        Siatkowka siatkowka_mecz = new Siatkowka(listaDruzynFazaPolfinalowo[i], listaDruzynFazaPolfinalowo[k], listaSedziow[0], "Faza grupowa");
-                        siatkowka_mecz.sedziowieDodatkowi.Add(listaSedziow[1]);
-                        siatkowka_mecz.sedziowieDodatkowi.Add(listaSedziow[2]);
-                        listaMeczyFazaPolfinalowa.Add(siatkowka_mecz);
-                        k++;
-                    }
-                    pomocnicza++;
-                    k = pomocnicza;
-                }
                 Console.WriteLine("Lista meczy w fazie polfinalowej\n====================================================\n");
-                for (int i = 0; i < listaMeczyFazaPolfinalowa.Count; i++)
-                {
-                    Console.WriteLine($"***********************************************\nMecz pomiedzy:");
-                    listaMeczyFazaPolfinalowa[i].wypiszStatystykiMeczu();
-                    Console.WriteLine($"***********************************************");
-
-                    Console.WriteLine();
-                    Console.WriteLine();
-                    Console.WriteLine();
-
-                }
+                rozegrajMeczeSiatkowkiDanejFazy("Faza polfinalowa");
                 Console.WriteLine("Koniec fazy polfinalowej\n=============================");
                 Console.ReadKey();
                 Console.Clear();
                 klasyfikujDruzynyFinal();
-                k = 1;
-                pomocnicza = 1;
                 /*
-
 
                 MECZE FAZA FNALOWA + DODAWANIE MECZY DO LIST FAZY FINALOWA
 
                 */
-                /*for (int i = 0; i < listaDruzynFazaFinalowa.Count - 1; i++)
-				{
-
-					while (k < listaDruzynFazaFinalowa.Count)
-					{
-						randomowa = generator.Next(4);
-						while (randomowa == 2)
-						{
-							randomowa = generator.Next(4);
-						}
-						punkty_1 = randomowa;
-						if (punkty_1 == 0)
-						{
-							punkty_2 = 3;
-						}
-						else if (punkty_1 == 1)
-						{
-							punkty_2 = 1;
-						}
-						else if (punkty_1 == 3)
-						{
-							punkty_2 = 0;
-						}
-						listaDruzynFazaFinalowa[i].dodajPunkty(punkty_1);
-						listaDruzynFazaFinalowa[k].dodajPunkty(punkty_2);
-						Siatkowka siatkowka_mecz = new Siatkowka(listaDruzynFazaFinalowa[i], listaDruzynFazaFinalowa[k], listaSedziow[0], "Faza grupowa");
-						siatkowka_mecz.sedziowieDodatkowi.Add(listaSedziow[1]);
-						siatkowka_mecz.sedziowieDodatkowi.Add(listaSedziow[2]);
-						listaMeczyFazaFinalowa.Add(siatkowka_mecz);
-						k++;
-					}
-					pomocnicza++;
-					k = pomocnicza;
-				}
                 Console.WriteLine("Lista meczy w fazie fianlowej\n====================================================\n");
-                for (int i = 0; i < listaMeczyFazaFinalowa.Count; i++)
-                {
-                    listaMeczyFazaFinalowa[i].wypiszStatystykiMeczu();
-
-
-                    Console.WriteLine();
-                    Console.WriteLine();
-                    Console.WriteLine();
-
-                }
+                rozegrajMeczeSiatkowkiDanejFazy("Faza finalowa");
                 Console.WriteLine("Koniec fazy finalowej\n=============================");
-                Console.ReadKey();			*/
+                Console.ReadKey();
             }
+
+            //
+            //          DWA OGNIE
+            //
 
             else if (this.typ == "Dwa_ognie")
             {
-                k = 1;
-                pomocnicza = 1;
-                for (int i = 0; i < listaDruzynFazaGrupowa.Count - 1; i++)
-                {
-
-                    while (k < listaDruzynFazaGrupowa.Count)
-                    {
-                        randomowa = generator.Next(4);
-                        while (randomowa == 2)
-                        {
-                            randomowa = generator.Next(4);
-                        }
-                        punkty_1 = randomowa;
-                        if (punkty_1 == 0)
-                        {
-                            punkty_2 = 3;
-                        }
-                        else if (punkty_1 == 1)
-                        {
-                            punkty_2 = 1;
-                        }
-                        else if (punkty_1 == 3)
-                        {
-                            punkty_2 = 0;
-                        }
-                        listaDruzynFazaGrupowa[i].dodajPunkty(punkty_1);
-                        listaDruzynFazaGrupowa[k].dodajPunkty(punkty_2);
-                        DwaOgnie dwaognie_mecz = new DwaOgnie(listaDruzynFazaGrupowa[i], listaDruzynFazaGrupowa[k], listaSedziow[0], "Faza grupowa");
-                        listaWszystkichMeczy.Add(dwaognie_mecz);
-                        k++;
-                    }
-                    pomocnicza++;
-                    k = pomocnicza;
-                }
-                for (int i = 0; i < listaWszystkichMeczy.Count; i++)
-                {
-                    listaWszystkichMeczy[i].wypiszStatystykiMeczu();
-
-
-                    Console.WriteLine();
-                    Console.WriteLine();
-                    Console.WriteLine();
-
-                }
+                /*
+                             
+                 MECZE FAZA GRUPOWA + DODAWANIE MECZY DO LIST FAZY GRUPOWEJ
+                 
+                 */
+                Console.WriteLine("Lista meczy w fazie grupowej\n====================================================\n");
+                rozegrajMeczeDanejFazy("Faza grupowa");
+                Console.WriteLine("Koniec fazy grupowej\n=============================");
                 Console.ReadKey();
+                Console.Clear();
                 klasyfikujDruzynyPolfinal();
-                k = 1;
-                pomocnicza = 1;
-                for (int i = 0; i < listaDruzynFazaPolfinalowo.Count - 1; i++)
-                {
+                /*
 
-                    while (k < listaDruzynFazaPolfinalowo.Count)
-                    {
-                        randomowa = generator.Next(4);
-                        while (randomowa == 2)
-                        {
-                            randomowa = generator.Next(4);
-                        }
-                        punkty_1 = randomowa;
-                        if (punkty_1 == 0)
-                        {
-                            punkty_2 = 3;
-                        }
-                        else if (punkty_1 == 1)
-                        {
-                            punkty_2 = 1;
-                        }
-                        else if (punkty_1 == 3)
-                        {
-                            punkty_2 = 0;
-                        }
-                        listaDruzynFazaPolfinalowo[i].dodajPunkty(punkty_1);
-                        listaDruzynFazaPolfinalowo[k].dodajPunkty(punkty_2);
-                        DwaOgnie dwaognie_mecz = new DwaOgnie(listaDruzynFazaGrupowa[i], listaDruzynFazaGrupowa[k], listaSedziow[0], "Faza grupowa");
-                        listaWszystkichMeczy.Add(dwaognie_mecz);
-                        k++;
-                    }
-                    pomocnicza++;
-                    k = pomocnicza;
-                }
+                MECZE FAZA POLFINALOWA + DODAWANIE MECZY DO LIST FAZY POLFINALOWA
+
+                */
+                Console.WriteLine("Lista meczy w fazie polfinalowej\n====================================================\n");
+                rozegrajMeczeDanejFazy("Faza polfinalowa");
+                Console.WriteLine("Koniec fazy polfinalowej\n=============================");
+                Console.ReadKey();
+                Console.Clear();
                 klasyfikujDruzynyFinal();
-                k = 1;
-                pomocnicza = 1;
-                for (int i = 0; i < listaDruzynFazaFinalowa.Count - 1; i++)
-                {
 
-                    while (k < listaDruzynFazaFinalowa.Count)
-                    {
-                        randomowa = generator.Next(4);
-                        while (randomowa == 2)
-                        {
-                            randomowa = generator.Next(4);
-                        }
-                        punkty_1 = randomowa;
-                        if (punkty_1 == 0)
-                        {
-                            punkty_2 = 3;
-                        }
-                        else if (punkty_1 == 1)
-                        {
-                            punkty_2 = 1;
-                        }
-                        else if (punkty_1 == 3)
-                        {
-                            punkty_2 = 0;
-                        }
-                        listaDruzynFazaFinalowa[i].dodajPunkty(punkty_1);
-                        listaDruzynFazaFinalowa[k].dodajPunkty(punkty_2);
-                        DwaOgnie dwaognie_mecz = new DwaOgnie(listaDruzynFazaGrupowa[i], listaDruzynFazaGrupowa[k], listaSedziow[0], "Faza grupowa");
-                        listaWszystkichMeczy.Add(dwaognie_mecz);
-                        k++;
-                    }
-                    pomocnicza++;
-                    k = pomocnicza;
-                }
+                /*
+
+                MECZE FAZA FNALOWA + DODAWANIE MECZY DO LIST FAZY FINALOWA
+
+                */
+
+                Console.WriteLine("Lista meczy w fazie finalowej\n====================================================\n");
+                rozegrajMeczeDanejFazy("Faza finalowa");
+                Console.WriteLine("Koniec fazy finalowej\n=============================");
+                Console.ReadKey();
+                Console.Clear();
+
             }
+            //
+            //          PRZECIAGANIE LINY
+            //
             else if (this.typ == "Przeciaganie_Liny")
             {
-                k = 1;
-                pomocnicza = 1;
-                for (int i = 0; i < listaDruzynFazaGrupowa.Count - 1; i++)
-                {
+                /*
 
-                    while (k < listaDruzynFazaGrupowa.Count)
-                    {
-                        randomowa = generator.Next(4);
-                        while (randomowa == 2)
-                        {
-                            randomowa = generator.Next(4);
-                        }
-                        punkty_1 = randomowa;
-                        if (punkty_1 == 0)
-                        {
-                            punkty_2 = 3;
-                        }
-                        else if (punkty_1 == 1)
-                        {
-                            punkty_2 = 1;
-                        }
-                        else if (punkty_1 == 3)
-                        {
-                            punkty_2 = 0;
-                        }
-                        listaDruzynFazaGrupowa[i].dodajPunkty(punkty_1);
-                        listaDruzynFazaGrupowa[k].dodajPunkty(punkty_2);
-                        PrzeciaganieLiny przeciaganieLiny_mecz = new PrzeciaganieLiny(listaDruzynFazaGrupowa[i], listaDruzynFazaGrupowa[k], listaSedziow[0], "Faza grupowa");
-                        listaWszystkichMeczy.Add(przeciaganieLiny_mecz);
-                        k++;
-                    }
-                    pomocnicza++;
-                    k = pomocnicza;
-                }
+                    MECZE FAZA GRUPOWA + DODAWANIE MECZY DO LIST FAZY GRUPOWEJ
+
+                    */
+                Console.WriteLine("Lista meczy w fazie grupowej\n====================================================\n");
+                rozegrajMeczeDanejFazy("Faza grupowa");
+                Console.WriteLine("Koniec fazy grupowej\n=============================");
+                Console.ReadKey();
+                Console.Clear();
                 klasyfikujDruzynyPolfinal();
-                k = 1;
-                pomocnicza = 1;
-                for (int i = 0; i < listaDruzynFazaPolfinalowo.Count - 1; i++)
-                {
+                /*
 
-                    while (k < listaDruzynFazaPolfinalowo.Count)
-                    {
-                        randomowa = generator.Next(4);
-                        while (randomowa == 2)
-                        {
-                            randomowa = generator.Next(4);
-                        }
-                        punkty_1 = randomowa;
-                        if (punkty_1 == 0)
-                        {
-                            punkty_2 = 3;
-                        }
-                        else if (punkty_1 == 1)
-                        {
-                            punkty_2 = 1;
-                        }
-                        else if (punkty_1 == 3)
-                        {
-                            punkty_2 = 0;
-                        }
-                        listaDruzynFazaPolfinalowo[i].dodajPunkty(punkty_1);
-                        listaDruzynFazaPolfinalowo[k].dodajPunkty(punkty_2);
-                        PrzeciaganieLiny przeciaganieLiny_mecz = new PrzeciaganieLiny(listaDruzynFazaGrupowa[i], listaDruzynFazaGrupowa[k], listaSedziow[0], "Faza grupowa");
-                        listaWszystkichMeczy.Add(przeciaganieLiny_mecz);
-                        k++;
-                    }
-                    pomocnicza++;
-                    k = pomocnicza;
-                }
+                MECZE FAZA POLFINALOWA + DODAWANIE MECZY DO LIST FAZY POLFINALOWA
+
+                */
+                Console.WriteLine("Lista meczy w fazie polfinalowej\n====================================================\n");
+                rozegrajMeczeDanejFazy("Faza polfinalowa");
+                Console.WriteLine("Koniec fazy polfinalowej\n=============================");
+                Console.ReadKey();
+                Console.Clear();
                 klasyfikujDruzynyFinal();
-                k = 1;
-                pomocnicza = 1;
-                for (int i = 0; i < listaDruzynFazaFinalowa.Count - 1; i++)
-                {
 
-                    while (k < listaDruzynFazaFinalowa.Count)
-                    {
-                        randomowa = generator.Next(4);
-                        while (randomowa == 2)
-                        {
-                            randomowa = generator.Next(4);
-                        }
-                        punkty_1 = randomowa;
-                        if (punkty_1 == 0)
-                        {
-                            punkty_2 = 3;
-                        }
-                        else if (punkty_1 == 1)
-                        {
-                            punkty_2 = 1;
-                        }
-                        else if (punkty_1 == 3)
-                        {
-                            punkty_2 = 0;
-                        }
-                        listaDruzynFazaFinalowa[i].dodajPunkty(punkty_1);
-                        listaDruzynFazaFinalowa[k].dodajPunkty(punkty_2);
-                        PrzeciaganieLiny przeciaganieLiny_mecz = new PrzeciaganieLiny(listaDruzynFazaGrupowa[i], listaDruzynFazaGrupowa[k], listaSedziow[0], "Faza grupowa");
-                        listaWszystkichMeczy.Add(przeciaganieLiny_mecz);
-                        k++;
-                    }
-                    pomocnicza++;
-                    k = pomocnicza;
-                }
+                /*
+
+                MECZE FAZA FNALOWA + DODAWANIE MECZY DO LIST FAZY FINALOWA
+
+                */
+
+                Console.WriteLine("Lista meczy w fazie finalowej\n====================================================\n");
+                rozegrajMeczeDanejFazy("Faza finalowa");
+                Console.WriteLine("Koniec fazy finalowej\n=============================");
+                Console.ReadKey();
+                Console.Clear();
             }
-
+            okreslLidera();
 
 		}
+
+		public bool wystartujTurniej()
+		{
+			if (listaDruzynFazaGrupowa.Count < 4)
+			{
+				Console.WriteLine("Turniej nie wystartowal! [ za mala ilosc druzyn ]");
+				return false;
+			}
+			else if (listaSedziow.Count < 1)
+			{
+				Console.WriteLine("Turniej nie wystartowal! [ musisz dodac przynajmniej 1 sedziego ]");
+				return false;
+			}
+			else if (listaSedziow.Count < 3 && typ == "Siatkowka")
+			{
+				Console.WriteLine("Turniej nie wystartowal! [ w przypadku meczy siatkowki musisz dodac przynajmniej 3 sedziow! ]");
+				return false;
+			}
+			else
+			{
+				Console.WriteLine("Warunki startu turnieju zostaly spelnione");
+				return true;
+			}
+		}
 		public void wczytajTurniejPlik() { }
+
+
 		public void klasyfikujDruzynyPolfinal()
         {
             listaDruzynFazaGrupowa.Sort((x, y) => x.getPunkty.CompareTo(y.getPunkty));
             for (int i = 0; i < 4; i++)
                 listaDruzynFazaPolfinalowo.Add(listaDruzynFazaGrupowa[i]);
         }
+		public void klasyfikujDruzynyFinal()
+        {
+            listaDruzynFazaPolfinalowo.Sort((x, y) => x.getPunkty.CompareTo(y.getPunkty));
+            for (int i = 0; i < 2; i++)
+                listaDruzynFazaFinalowa.Add(listaDruzynFazaPolfinalowo[i]);
+        }
 
-		public void klasyfikujDruzynyFinal() { }
-		public void wypiszTabeleWynikow() { }
+        public void okreslLidera()
+        {
+            if (listaDruzynFazaFinalowa[0].getPunkty > listaDruzynFazaFinalowa[1].getPunkty)
+                finalista = listaDruzynFazaFinalowa[0];
+            else
+                finalista = listaDruzynFazaFinalowa[1];
+        }
+
+		public void wypiszTabeleWynikow() {
+            Console.Clear();
+            Console.WriteLine($"PODSUMOWANIE TURNIEJU\n ** {this.nazwa} **\n\n" +
+                $"W turnieju wzielo udzial {listaDruzynFazaGrupowa.Count } druzyn\n" +
+                $"Rozegrano {listaMeczyFazaPolfinalowa.Count + listaMeczyFazaGrupowa.Count + listaDruzynFazaFinalowa.Count} meczy\n\n" +
+                $"**** LIDER ****\n\n");
+            finalista.pokazDruzyne();
+        }
 
 	}
 }

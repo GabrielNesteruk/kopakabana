@@ -17,7 +17,7 @@ namespace Kopakabana
 		{
 			druzyna1.pokazDruzyne();
 			druzyna2.pokazDruzyne();
-
+         
 			Console.WriteLine("Sedzia główny: " + sedziaGlowny.getImie() + sedziaGlowny.getNazwisko() + " Sedzia dodatkowy: " + sedziowieDodatkowi[0].getImie() + " " + sedziowieDodatkowi[0].getNazwisko() + ", "+ sedziowieDodatkowi[1].getImie() + " " + sedziowieDodatkowi[1].getNazwisko());
 			Console.WriteLine();
 		}
