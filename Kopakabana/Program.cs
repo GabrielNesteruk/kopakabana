@@ -71,8 +71,12 @@ namespace Kopakabana
                         switch (Int32.Parse(wybor))
                         {
                             case 1:
-                                // wczytywanie turnieju z pliku
-                                etapWyboru++;
+                                Console.Clear();
+                                Console.WriteLine("Podaj nazwe pliku z turniejem:");
+                                string fname = Console.ReadLine();
+                                turniej.wczytajTurniejPlik(fname);
+                                turniej.sprawdzTurniejPlik();
+                                etapWyboru += 2;
                                 break;
                             case 2:
                                 // tworzenie turnieju
@@ -203,8 +207,11 @@ namespace Kopakabana
                     Console.WriteLine("Oszukano zabezpieczenia");
             }
             // rozgrywanie meczy
-            turniej.rozegrajMecze();
-            turniej.wypiszTabeleWynikow();
+            if (warunkiStartuTurnieju == true)
+            {
+                turniej.rozegrajMecze();
+                turniej.wypiszTabeleWynikow();
+            }
         }
     }
 }

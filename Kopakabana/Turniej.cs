@@ -5,6 +5,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using Microsoft.Win32;
+using System.IO;
 
 namespace Kopakabana
 {
@@ -13,29 +14,22 @@ namespace Kopakabana
 	{
 		private string nazwa;
 		private string typ;
-		private List<Sedzia> listaSedziow;
-        private List<Mecz> listaMeczyFazaGrupowa;
-        private List<Mecz> listaMeczyFazaPolfinalowa;
-        private List<Mecz> listaMeczyFazaFinalowa;
+		private List<Sedzia> listaSedziow = new List<Sedzia>();
+        private List<Mecz> listaMeczyFazaGrupowa = new List<Mecz>();
+        private List<Mecz> listaMeczyFazaPolfinalowa = new List<Mecz>();
+        private List<Mecz> listaMeczyFazaFinalowa = new List<Mecz>();
 
-        private List<Druzyna> listaDruzynFazaGrupowa;
-		private List<Druzyna> listaDruzynFazaPolfinalowo;
-		private List<Druzyna> listaDruzynFazaFinalowa;
-		private Druzyna finalista;
+        private List<Druzyna> listaDruzynFazaGrupowa = new List<Druzyna>();
+        private List<Druzyna> listaDruzynFazaPolfinalowo = new List<Druzyna>();
+        private List<Druzyna> listaDruzynFazaFinalowa = new List<Druzyna>();
+        private Druzyna finalista;
 
 		public Turniej() { }
 
 		public Turniej(string nazwa, string typ)
 		{
 			this.nazwa = nazwa;
-			this.typ = typ;
-			listaSedziow = new List<Sedzia>();
-			listaDruzynFazaGrupowa = new List<Druzyna>();
-			listaDruzynFazaPolfinalowo = new List<Druzyna>();
-			listaDruzynFazaFinalowa = new List<Druzyna>();
-            listaMeczyFazaGrupowa = new List<Mecz>();
-            listaMeczyFazaPolfinalowa = new List<Mecz>();
-            listaMeczyFazaFinalowa = new List<Mecz>();
+            this.typ = typ;
         }
 
 		public string getTyp => typ;
@@ -603,8 +597,74 @@ namespace Kopakabana
 				return true;
 			}
 		}
-		public void wczytajTurniejPlik() { }
-
+		public void wczytajTurniejPlik(string fname)
+        {
+            StreamReader file_read;
+            try
+            {
+                file_read = new StreamReader(fname + ".txt");
+                string tmp = String.Empty;
+                int i = 0;
+                while((tmp = file_read.ReadLine()) != null)
+                {
+                    switch (i)
+                    {
+                        case 0: // nazwa
+                            this.nazwa = tmp;
+                            i++;
+                            break;
+                        case 1: // typ
+                            this.typ = tmp;
+                            i++;
+                            break;
+                        case 2: // druzyny
+                            string[] words = tmp.Split(' ');
+                            foreach (var word in words)
+                            {
+                                this.listaDruzynFazaGrupowa.Add(new Druzyna(word, 0, this.typ));
+                            }
+                            i++;
+                            break;
+                        case 3: // sedzia glowny
+                            string[] words_SedziaG = tmp.Split(' ');
+                            listaSedziow.Add(new Sedzia(words_SedziaG[0], words_SedziaG[1]));
+                            i++;
+                            break;
+                        case 4: // pomocniczy1 w siatce
+                            if (typ == "Siatkowka")
+                            {
+                                string[] words_SedziaP1 = tmp.Split(' ');
+                                this.listaSedziow.Add(new Sedzia(words_SedziaP1[0], words_SedziaP1[1]));
+                                i++;
+                            }
+                            break;
+                        case 5: // pomocniczy2 w siatce
+                            if (typ == "Siatkowka")
+                            {
+                                string[] words_SedziaP2 = tmp.Split(' ');
+                                this.listaSedziow.Add(new Sedzia(words_SedziaP2[0], words_SedziaP2[1]));
+                            }
+                            break;
+                    }
+                }
+                file_read.Close();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Environment.Exit(0);
+            }
+        }
+        public void sprawdzTurniejPlik()
+        {
+            if((typ != "Siatkowka" && typ != "Dwa_ognie" && typ != "Przeciaganie_Liny") || nazwa == "" || listaDruzynFazaGrupowa.Count < 4 || listaSedziow.Count < 0)
+            {
+                Console.Clear();
+                Console.WriteLine("Blad wczytywania z pliku, prawdopodobnie jego zawartosc jest nieprawidlowa!");
+                Console.ReadLine();
+                Environment.Exit(0);
+            }
+        }
 
 		public void klasyfikujDruzynyPolfinal()
         {
