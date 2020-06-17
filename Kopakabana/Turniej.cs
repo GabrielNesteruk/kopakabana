@@ -316,7 +316,7 @@ namespace Kopakabana
                 }
             }
             else
-                throw new WrongMatchPhase("Blad programu! [ Nieprawidlowa faza meczu ]");
+                throw new WrongMatchPhaseException("Blad programu! [ Nieprawidlowa faza meczu ]");
         }
         private void rozegrajMeczeDanejFazy(string faza)
         {
@@ -443,7 +443,7 @@ namespace Kopakabana
                 }
             }
             else
-                throw new WrongMatchPhase("Blad programu! [ Nieprawidlowa faza meczu ]");
+                throw new WrongMatchPhaseException("Blad programu! [ Nieprawidlowa faza meczu ]");
         }
 		public void rozegrajMecze()
 		{

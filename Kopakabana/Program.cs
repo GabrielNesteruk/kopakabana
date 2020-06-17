@@ -35,15 +35,6 @@ namespace Kopakabana
             Console.WriteLine("0. Wyjdz z menu");
         }
 
-        static bool regexName(string imie, string nazwisko)
-        {
-            Regex regex = new Regex("^[a-zA-Z]+$");
-            if (regex.IsMatch(imie) && regex.IsMatch(nazwisko))
-                return true;
-            else
-                return false;
-        }
-
         static void Main()
         {
             /* INICJALIZACJA ZMIENNYCH STARTOWYCH*/

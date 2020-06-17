@@ -52,11 +52,12 @@
     <Compile Include="Sedziowie.cs" />
     <Compile Include="Siatkowka.cs" />
     <Compile Include="Turniej.cs" />
-    <Compile Include="WrongMatchPhase.cs" />
+    <Compile Include="WrongMatchPhaseException.cs" />
     <Compile Include="WrongMatchTypeException.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
